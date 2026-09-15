@@ -34,19 +34,10 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Build Release APK
-        run: ./gradlew assembleRelease --stacktrace 2>&1 | tee build.log
-        continue-on-error: true
+        run: ./gradlew assembleRelease --stacktrace --info 2>&1 | tee build.log
 
-      - name: Show Build Error (if any)
-        if: failure()
-        run: cat build.log
-
-      - name: Upload Build Log
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-log
-          path: build.log
+      - name: List APK output (debug)
+        run: find app/build/outputs -type f 2>/dev/null || echo "No output folder found"
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4

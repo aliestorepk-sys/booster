@@ -30,14 +30,23 @@ jobs:
       - name: Generate Gradle Wrapper
         run: gradle wrapper --gradle-version 8.2
 
-      - name: List project files
-        run: ls -la && ls -la app/
-
       - name: Grant Gradle Execute Permission
         run: chmod +x ./gradlew
 
       - name: Build Release APK
-        run: ./gradlew assembleRelease --info --stacktrace
+        run: ./gradlew assembleRelease --stacktrace 2>&1 | tee build.log
+        continue-on-error: true
+
+      - name: Show Build Error (if any)
+        if: failure()
+        run: cat build.log
+
+      - name: Upload Build Log
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-log
+          path: build.log
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
